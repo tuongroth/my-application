@@ -12,3 +12,36 @@
     border-radius: 15px 15px 0px 0px; /* Corrected "bonder-radius" to "border-radius" */
   }
   
+  .food-item-name-rating p {
+    font-size: 20px;
+    font-weight: 500;
+  }
+  
+  .food-item-name-rating img {
+    width: 70px;
+  }
+  
+  .food-item-descr {
+    color: #676767;
+    font-size: 12px;
+  }
+  
+  .food-item-price {
+    color: tomato;
+    font-size: 22px;
+    font-weight: 500; /* Fixed invalid value */
+  }
+  
+  .food-item-img-container {
+    position: relative;
+  }
+  
+  .food-item-img-container.add {
+    width: 35px;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  
