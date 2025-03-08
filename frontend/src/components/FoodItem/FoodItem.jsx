@@ -5,13 +5,15 @@ import './FoodItem.css'
 
 const FoodItem = ({ id, name, price, description, image }) => {
  
+ 
   return (
     <div className="food-item">
       {/* Food Image Section */}
       <div className="food-item-img-container">
         <img className="food-item-image" src={image} alt="" />
-        
       </div>
+
+      
 
 
 
