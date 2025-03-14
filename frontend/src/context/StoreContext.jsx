@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { food_list } from '../assets/assets';
+import { food_list } from '../assets/assets'; // Assuming food_list is imported from a data file
 
-// Create context
+// Create context for the store
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
@@ -34,18 +34,31 @@ const StoreContextProvider = (props) => {
     console.log(cartItems); // This logs the cart items whenever they change
   }, [cartItems]);
 
-  // Define context value that will be passed to children
+  // Calculate the total cart amount based on cart items and prices
+  const getTotalCartAmount = () => {
+    let totalAmount = 0;
+    // Loop through each item in cartItems
+    for (const itemId in cartItems) {
+      const item = food_list.find((food) => food._id === itemId); // Find the item in food_list by _id
+      if (item) {
+        totalAmount += item.price * cartItems[itemId]; // Multiply price by quantity
+      }
+    }
+    return totalAmount; // Return the calculated total amount
+  };
+
+  // Define context value to be shared across the application
   const contextValue = {
     cartItems,
     addToCart,
     removeFromCart,
-    setCartItems, // Thêm dấu phẩy để tránh lỗi
-    food_list
+    getTotalCartAmount, // Provide the function for calculating the total amount
+    food_list, // Provide the food list for reference in components
   };
 
   return (
     <StoreContext.Provider value={contextValue}>
-      {props.children}
+      {props.children} {/* Render the children components */}
     </StoreContext.Provider>
   );
 };
