@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { food_list } from '../assets/assets'; // Assuming food_list is imported from a data file
+import { food_list } from '../assets/assets'; // Adjust the path if needed
 
 // Create context for the store
 export const StoreContext = createContext(null);
@@ -11,9 +11,11 @@ const StoreContextProvider = (props) => {
   const addToCart = (itemId) => {
     setCartItems((prev) => {
       if (!prev[itemId]) {
-        return { ...prev, [itemId]: 1 }; // Add the item with quantity 1 if it's not in the cart
+        // If the item is not in the cart, add it with quantity 1
+        return { ...prev, [itemId]: 1 };
       }
-      return { ...prev, [itemId]: prev[itemId] + 1 }; // Increment quantity if the item is already in the cart
+      // If the item is already in the cart, increment its quantity
+      return { ...prev, [itemId]: prev[itemId] + 1 };
     });
   };
 
@@ -21,44 +23,48 @@ const StoreContextProvider = (props) => {
   const removeFromCart = (itemId) => {
     setCartItems((prev) => {
       if (prev[itemId] > 1) {
-        return { ...prev, [itemId]: prev[itemId] - 1 }; // Decrease quantity if greater than 1
+        // Decrease quantity if more than 1
+        return { ...prev, [itemId]: prev[itemId] - 1 };
       }
+      // Otherwise, remove the item from the cart entirely
       const newCart = { ...prev };
-      delete newCart[itemId]; // Remove the item completely if quantity reaches 0
+      delete newCart[itemId];
       return newCart;
     });
   };
 
-  // Log cart items for debugging
-  useEffect(() => {
-    console.log(cartItems); // This logs the cart items whenever they change
-  }, [cartItems]);
-
-  // Calculate the total cart amount based on cart items and prices
+  // Calculate the total cart amount based on item prices and quantities
   const getTotalCartAmount = () => {
     let totalAmount = 0;
-    // Loop through each item in cartItems
     for (const itemId in cartItems) {
-      const item = food_list.find((food) => food._id === itemId); // Find the item in food_list by _id
-      if (item) {
-        totalAmount += item.price * cartItems[itemId]; // Multiply price by quantity
+      if (cartItems[itemId] > 0) {
+        // Find the corresponding product in the food_list
+        const item = food_list.find((food) => food._id === itemId);
+        if (item) {
+          totalAmount += item.price * cartItems[itemId];
+        }
       }
     }
-    return totalAmount; // Return the calculated total amount
+    return totalAmount;
   };
 
-  // Define context value to be shared across the application
+  // Log cart items for debugging whenever they change
+  useEffect(() => {
+    console.log(cartItems);
+  }, [cartItems]);
+
+  // Context value to be shared across the application
   const contextValue = {
     cartItems,
     addToCart,
     removeFromCart,
-    getTotalCartAmount, // Provide the function for calculating the total amount
-    food_list, // Provide the food list for reference in components
+    getTotalCartAmount,
+    food_list,
   };
 
   return (
     <StoreContext.Provider value={contextValue}>
-      {props.children} {/* Render the children components */}
+      {props.children}
     </StoreContext.Provider>
   );
 };
