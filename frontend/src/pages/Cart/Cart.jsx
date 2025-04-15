@@ -1,20 +1,41 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import './Cart.css';
 import { StoreContext } from '../../context/StoreContext';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
     const { cartItems, food_list, removeFromCart } = useContext(StoreContext);
+    const navigate = useNavigate();
+    const [promoCode, setPromoCode] = useState('');
+    const [discount, setDiscount] = useState(0);
 
-    // Calculate Subtotal
-    const subtotal = food_list.reduce((acc, item) => {
-        return acc + item.price * (cartItems[item._id] || 0);
-    }, 0);
+    const calculateSubtotal = () => {
+        return food_list.reduce((total, item) => {
+            if (cartItems[item._id] > 0) {
+                total += item.price * cartItems[item._id];
+            }
+            return total;
+        }, 0);
+    };
 
-    // Delivery Fee (Static for now, you can change it dynamically)
-    const deliveryFee = subtotal > 0 ? 2.0 : 0; 
+    const calculateDelivery = () => 5.0;
 
-    // Total Cost
-    const total = subtotal + deliveryFee;
+    const calculateTotal = () => {
+        return calculateSubtotal() + calculateDelivery() - discount;
+    };
+
+    const applyPromoCode = () => {
+        if (promoCode === 'DISCOUNT10') {
+            setDiscount(10);
+        } else {
+            setDiscount(0);
+            alert('Invalid promo code');
+        }
+    };
+
+    const subtotal = calculateSubtotal();
+    const deliveryFee = calculateDelivery();
+    const total = calculateTotal();
 
     return (
         <div className='cart'>
@@ -27,20 +48,19 @@ const Cart = () => {
                     <p>Total</p>
                     <p>Remove</p>
                 </div>
-
                 <br />
                 <hr />
-
-                {food_list.map((item) => {
+                {food_list.map((item, index) => {
                     if (cartItems[item._id] > 0) {
                         return (
-                            <div key={item._id} className='cart-items-title cart-items-item'>
-                                <img src={item.image} alt={item.name} width="50" />
+                            <div key={item._id} className="cart-items-item">
+                                <img src={item.image} alt={item.name} />
                                 <p>{item.name}</p>
                                 <p>${item.price.toFixed(2)}</p>
                                 <p>{cartItems[item._id]}</p>
                                 <p>${(item.price * cartItems[item._id]).toFixed(2)}</p>
-                                <button onClick={() => removeFromCart(item._id)}>Remove</button>
+                                <p onClick={() => removeFromCart(item._id)} className="cross">x</p>
+                                <hr />
                             </div>
                         );
                     }
@@ -48,36 +68,45 @@ const Cart = () => {
                 })}
             </div>
 
-            {/* Cart Total Section */}
-            <div className="cart-total">
-                <div className="cart-total-details">
-                    <p>Subtotal</p>
-                    <p>${subtotal.toFixed(2)}</p>
+            {/* Cart total section */}
+            <div className="cart-bottom">
+                <div className="cart-total">
+                    <h2>Cart Totals</h2>
+
+                    <div className="cart-total-details">
+                        <p>Subtotal</p>
+                        <p>${subtotal.toFixed(2)}</p>
+                    </div>
+
+                    <hr />
+
+                    <div className="cart-total-details">
+                        <p>Delivery Fee</p>
+                        <p>${deliveryFee.toFixed(2)}</p>
+                    </div>
+
+                    <hr />
+
+                    <div className="cart-total-details">
+                        <b>Total</b>
+                        <b>${total.toFixed(2)}</b>
+                    </div>
+
+                    <button onClick={() => navigate('/order')}>PROCEED TO CHECKOUT</button>
                 </div>
 
-                <hr />
-
-                <div className="cart-total-details">
-                    <p>Delivery Fee</p>
-                    <p>${deliveryFee.toFixed(2)}</p>
-                </div>
-
-                <hr />
-
-                <div className="cart-total-details">
-                    <b>Total</b>
-                    <b>${total.toFixed(2)}</b>
-                </div>
-
-                <button className="checkout-button">PROCEED TO CHECKOUT</button>
-            </div>
-
-            {/* Promo Code Section */}
-            <div className="cart-promocode">
-                <p>If you have a promo code, enter it here:</p>
-                <div className="cart-promocode-input">
-                    <input type="text" placeholder="Enter promo code" />
-                    <button>Apply</button>
+                {/* Promo Code Section */}
+                <div className="cart-promocode">
+                    <p>If you have a promo code, enter it here:</p>
+                    <div className="cart-promocode-input">
+                        <input
+                            type="text"
+                            value={promoCode}
+                            onChange={(e) => setPromoCode(e.target.value)}
+                            placeholder="Promo Code"
+                        />
+                        <button onClick={applyPromoCode}>Apply</button>
+                    </div>
                 </div>
             </div>
         </div>

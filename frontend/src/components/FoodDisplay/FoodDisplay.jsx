@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import './FoodDisplay.css';
 import { StoreContext } from '../../context/StoreContext';
-import FoodItem from '../FoodItem/FoodItem'; // Import the FoodItem component if not already imported
+import FoodItem from '../FoodItem/FoodItem';
 
 const FoodDisplay = ({ category }) => {
   const { food_list } = useContext(StoreContext);
@@ -9,20 +9,24 @@ const FoodDisplay = ({ category }) => {
   return (
     <div className="food-display" id="food-display">
       <h2>Top dishes near you</h2>
-      <div className="food-display-list"> {/* Fixed missing opening div tag */}
+      <div className="food-display-list">
         {food_list.map((item, index) => {
-          return (
-            <FoodItem 
-              key={index} 
-              id={item._id} 
-              name={item.name} 
-              description={item.description} 
-              price={item.price} 
-              image={item.image} 
-            />
-          );
+          if (category === "All" || category === item.category) {
+            return (
+              <FoodItem 
+                key={index}
+                id={item._id}
+                name={item.name}
+                description={item.description}
+                price={item.price}
+                image={item.image}
+              />
+            );
+          } else {
+            return null; // không hiện gì nếu không đúng category
+          }
         })}
-      </div> {/* Fixed missing closing div tag */}
+      </div>
     </div>
   );
 };
